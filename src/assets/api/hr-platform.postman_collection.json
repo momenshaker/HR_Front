@@ -1,0 +1,722 @@
+{
+  "info": {
+    "name": "HR Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hr.admin@company.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"token\": \"jwt-token\",\n  \"expiresIn\": 3600,\n  \"user\": {\n    \"id\": 1,\n    \"name\": \"HR Admin\",\n    \"roles\": [\"ADMIN\"]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Organization",
+      "item": [
+        {
+          "name": "List Departments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/organization/departments?page={{page}}&pageSize={{pageSize}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["organization", "departments"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Engineering\",\n      \"manager\": \"Jane Smith\"\n    }\n  ],\n  \"total\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Marketing\",\n  \"managerId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organization/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["organization", "departments"]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 2,\n  \"name\": \"Marketing\",\n  \"managerId\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering\",\n  \"managerId\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organization/departments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["organization", "departments", ":id"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Engineering\",\n  \"managerId\": 3\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "List Employees",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees?departmentId={{departmentId}}&page={{page}}&pageSize={{pageSize}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees"],
+              "query": [
+                { "key": "departmentId", "value": "" },
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 10,\n      \"firstName\": \"Lina\",\n      \"lastName\": \"Hassan\",\n      \"department\": \"Engineering\",\n      \"title\": \"Senior Developer\",\n      \"status\": \"ACTIVE\"\n    }\n  ],\n  \"total\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Employee Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 10,\n  \"firstName\": \"Lina\",\n  \"lastName\": \"Hassan\",\n  \"email\": \"lina.hassan@example.com\",\n  \"status\": \"ACTIVE\",\n  \"job\": {\n    \"title\": \"Senior Developer\",\n    \"department\": \"Engineering\",\n    \"manager\": \"Jane Smith\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Adam\",\n  \"lastName\": \"Abdel\",\n  \"email\": \"adam.abdel@example.com\",\n  \"departmentId\": 1,\n  \"title\": \"QA Engineer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees"]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 11,\n  \"firstName\": \"Adam\",\n  \"lastName\": \"Abdel\",\n  \"email\": \"adam.abdel@example.com\",\n  \"status\": \"INVITED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lead QA Engineer\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": 11,\n  \"title\": \"Lead QA Engineer\",\n  \"status\": \"ACTIVE\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Time & Attendance",
+      "item": [
+        {
+          "name": "Get Timesheet",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/time/timesheets/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["time", "timesheets", "current"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"weekStart\": \"2024-06-03\",\n  \"entries\": [\n    {\n      \"id\": 100,\n      \"date\": \"2024-06-03\",\n      \"hours\": 8,\n      \"project\": \"Platform\",\n      \"status\": \"SUBMITTED\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Time Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-06-04\",\n  \"hours\": 6,\n  \"project\": \"Platform\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/time/entries",
+              "host": ["{{baseUrl}}"],
+              "path": ["time", "entries"]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 101,\n  \"status\": \"DRAFT\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit Timesheet",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weekStart\": \"2024-06-03\",\n  \"entries\": [\n    {\n      \"date\": \"2024-06-03\",\n      \"hours\": 8,\n      \"project\": \"Platform\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/time/timesheets/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["time", "timesheets", "submit"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"SUBMITTED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Timesheet",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timesheetId\": 4001,\n  \"decision\": \"APPROVED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/time/timesheets/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["time", "timesheets", "approve"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"APPROVED\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leave",
+      "item": [
+        {
+          "name": "List Leave Balances",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/leave/balances",
+              "host": ["{{baseUrl}}"],
+              "path": ["leave", "balances"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"vacation\": 12,\n  \"sick\": 8\n}"
+            }
+          ]
+        },
+        {
+          "name": "Request Leave",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"VACATION\",\n  \"startDate\": \"2024-07-10\",\n  \"endDate\": \"2024-07-15\",\n  \"reason\": \"Family trip\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leave/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["leave", "requests"]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 501,\n  \"status\": \"PENDING_APPROVAL\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Leave",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": 501,\n  \"decision\": \"APPROVED\",\n  \"comment\": \"Enjoy!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leave/requests/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["leave", "requests", "approve"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"APPROVED\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Payroll",
+      "item": [
+        {
+          "name": "List Payroll Runs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payroll/runs",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "runs"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 7001,\n      \"period\": \"2024-05\",\n      \"status\": \"POSTED\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Preview Payroll",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period\": \"2024-06\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payroll/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "preview"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"summary\": {\n    \"gross\": 120000,\n    \"net\": 95000\n  },\n  \"employees\": [\n    {\n      \"employeeId\": 10,\n      \"netPay\": 5000\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Finalize Payroll",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period\": \"2024-06\",\n  \"approve\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payroll/finalize",
+              "host": ["{{baseUrl}}"],
+              "path": ["payroll", "finalize"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"POSTED\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Performance",
+      "item": [
+        {
+          "name": "List Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/performance/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["performance", "reviews"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 9001,\n      \"employee\": \"Lina Hassan\",\n      \"period\": \"2024 H1\",\n      \"status\": \"IN_PROGRESS\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewId\": 9001,\n  \"scores\": {\n    \"teamwork\": 4,\n    \"delivery\": 5\n  },\n  \"summary\": \"Strong performance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/performance/reviews/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["performance", "reviews", "submit"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"SUBMITTED\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recruitment",
+      "item": [
+        {
+          "name": "List Candidates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/recruitment/candidates?stage={{stage}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["recruitment", "candidates"],
+              "query": [
+                { "key": "stage", "value": "SCREENING" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 1001,\n      \"name\": \"Noha Ali\",\n      \"role\": \"Product Manager\",\n      \"stage\": \"SCREENING\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Advance Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateId\": 1001,\n  \"stage\": \"INTERVIEW\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recruitment/candidates/advance",
+              "host": ["{{baseUrl}}"],
+              "path": ["recruitment", "candidates", "advance"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"stage\": \"INTERVIEW\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Training",
+      "item": [
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/training/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["training", "courses"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 2001,\n      \"title\": \"Leadership 101\",\n      \"status\": \"OPEN\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Enroll Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": 2001\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/training/enroll",
+              "host": ["{{baseUrl}}"],
+              "path": ["training", "enroll"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"ENROLLED\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Communications",
+      "item": [
+        {
+          "name": "List Announcements",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/communications/announcements",
+              "host": ["{{baseUrl}}"],
+              "path": ["communications", "announcements"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 3001,\n      \"title\": \"Office Renovation\",\n      \"publishedAt\": \"2024-05-01\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Publish Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Benefits\",\n  \"body\": \"We have expanded the health plan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/communications/announcements",
+              "host": ["{{baseUrl}}"],
+              "path": ["communications", "announcements"]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": 3002,\n  \"status\": \"PUBLISHED\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Headcount Summary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/analytics/headcount",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "headcount"]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"total\": 150,\n  \"departments\": [\n    {\n      \"name\": \"Engineering\",\n      \"headcount\": 60\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Attrition",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/analytics/attrition?year={{year}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "attrition"],
+              "query": [
+                { "key": "year", "value": "2024" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"rate\": 0.07\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

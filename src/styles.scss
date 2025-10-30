@@ -1,0 +1,17 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: mat.get-theme-color(mat.define-light-theme((), ()), 'background');
+}
+
+.full-height {
+  height: 100%;
+}
