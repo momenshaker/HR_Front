@@ -67,13 +67,13 @@ export class ApiClient {
   }
 
   private resolveUrl(path: string, pathParams?: Record<string, string | number>): string {
-    if (!pathParams) {
-      return `${this.config.apiBaseUrl}${path}`;
-    }
-    const resolved = Object.entries(pathParams).reduce((acc, [key, value]) => {
-      return acc.replace(`:${key}`, encodeURIComponent(String(value)));
-    }, path);
-    return `${this.config.apiBaseUrl}${resolved}`;
+    const resolvedPath = pathParams
+      ? Object.entries(pathParams).reduce((acc, [key, value]) => {
+        return acc.replace(`:${key}`, encodeURIComponent(String(value)));
+      }, path)
+      : path;
+
+    return joinUrl(this.config.apiBaseUrl, resolvedPath);
   }
 
   private createParams(query?: Record<string, string | number | boolean | undefined | null>): HttpParams | undefined {
@@ -141,4 +141,19 @@ function generateIdempotencyKey(): string {
     return globalCrypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function joinUrl(base: string, path: string): string {
+  const normalizedBase = base.replace(/\/+$/, '');
+  const normalizedPath = path.replace(/^\/+/, '');
+
+  if (!normalizedBase) {
+    return `/${normalizedPath}`;
+  }
+
+  if (!normalizedPath) {
+    return normalizedBase;
+  }
+
+  return `${normalizedBase}/${normalizedPath}`;
 }
