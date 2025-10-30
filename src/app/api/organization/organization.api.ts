@@ -22,6 +22,7 @@ export interface ListDepartmentsOptions {
     pageSize?: string | number | boolean;
   };
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const CreateDepartmentRequestSchema = z.object({
@@ -41,6 +42,7 @@ export interface CreateDepartmentOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: CreateDepartmentRequest;
+  headers?: Record<string, string>;
 }
 
 const UpdateDepartmentRequestSchema = z.object({
@@ -62,6 +64,7 @@ export interface UpdateDepartmentOptions {
   };
   query?: undefined;
   body?: UpdateDepartmentRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -72,12 +75,17 @@ export class OrganizationApiService {
     return this.client.request<ListDepartmentsResponse>('GET', '/organization/departments', {
       queryParams: options.query,
       responseSchema: ListDepartmentsResponseSchema,
+      headers: options.headers,
     });
   }
   createDepartment(options: CreateDepartmentOptions = {}): Observable<CreateDepartmentResponse> {
     return this.client.request<CreateDepartmentResponse, CreateDepartmentRequest>('POST', '/organization/departments', {
       body: options.body,
       responseSchema: CreateDepartmentResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
   updateDepartment(options: UpdateDepartmentOptions): Observable<UpdateDepartmentResponse> {
@@ -85,6 +93,10 @@ export class OrganizationApiService {
       pathParams: options.pathParams,
       body: options.body,
       responseSchema: UpdateDepartmentResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

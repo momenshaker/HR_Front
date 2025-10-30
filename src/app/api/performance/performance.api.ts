@@ -19,6 +19,7 @@ export interface ListReviewsOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const SubmitReviewRequestSchema = z.object({
@@ -40,6 +41,7 @@ export interface SubmitReviewOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: SubmitReviewRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -49,12 +51,17 @@ export class PerformanceApiService {
   listReviews(options: ListReviewsOptions = {}): Observable<ListReviewsResponse> {
     return this.client.request<ListReviewsResponse>('GET', '/performance/reviews', {
       responseSchema: ListReviewsResponseSchema,
+      headers: options.headers,
     });
   }
   submitReview(options: SubmitReviewOptions = {}): Observable<SubmitReviewResponse> {
     return this.client.request<SubmitReviewResponse, SubmitReviewRequest>('POST', '/performance/reviews/submit', {
       body: options.body,
       responseSchema: SubmitReviewResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

@@ -26,6 +26,7 @@ export interface ListEmployeesOptions {
     pageSize?: string | number | boolean;
   };
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const GetEmployeeDetailsResponseSchema = z.object({
@@ -48,6 +49,7 @@ export interface GetEmployeeDetailsOptions {
   };
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const CreateEmployeeRequestSchema = z.object({
@@ -72,6 +74,7 @@ export interface CreateEmployeeOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: CreateEmployeeRequest;
+  headers?: Record<string, string>;
 }
 
 const UpdateEmployeeRequestSchema = z.object({
@@ -93,6 +96,7 @@ export interface UpdateEmployeeOptions {
   };
   query?: undefined;
   body?: UpdateEmployeeRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -103,18 +107,24 @@ export class EmployeesApiService {
     return this.client.request<ListEmployeesResponse>('GET', '/employees', {
       queryParams: options.query,
       responseSchema: ListEmployeesResponseSchema,
+      headers: options.headers,
     });
   }
   getEmployeeDetails(options: GetEmployeeDetailsOptions): Observable<GetEmployeeDetailsResponse> {
     return this.client.request<GetEmployeeDetailsResponse>('GET', '/employees/:id', {
       pathParams: options.pathParams,
       responseSchema: GetEmployeeDetailsResponseSchema,
+      headers: options.headers,
     });
   }
   createEmployee(options: CreateEmployeeOptions = {}): Observable<CreateEmployeeResponse> {
     return this.client.request<CreateEmployeeResponse, CreateEmployeeRequest>('POST', '/employees', {
       body: options.body,
       responseSchema: CreateEmployeeResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
   updateEmployee(options: UpdateEmployeeOptions): Observable<UpdateEmployeeResponse> {
@@ -122,6 +132,10 @@ export class EmployeesApiService {
       pathParams: options.pathParams,
       body: options.body,
       responseSchema: UpdateEmployeeResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

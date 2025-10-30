@@ -18,6 +18,7 @@ export interface ListPayrollRunsOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const PreviewPayrollRequestSchema = z.object({
@@ -41,6 +42,7 @@ export interface PreviewPayrollOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: PreviewPayrollRequest;
+  headers?: Record<string, string>;
 }
 
 const FinalizePayrollRequestSchema = z.object({
@@ -58,6 +60,7 @@ export interface FinalizePayrollOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: FinalizePayrollRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -67,18 +70,27 @@ export class PayrollApiService {
   listPayrollRuns(options: ListPayrollRunsOptions = {}): Observable<ListPayrollRunsResponse> {
     return this.client.request<ListPayrollRunsResponse>('GET', '/payroll/runs', {
       responseSchema: ListPayrollRunsResponseSchema,
+      headers: options.headers,
     });
   }
   previewPayroll(options: PreviewPayrollOptions = {}): Observable<PreviewPayrollResponse> {
     return this.client.request<PreviewPayrollResponse, PreviewPayrollRequest>('POST', '/payroll/preview', {
       body: options.body,
       responseSchema: PreviewPayrollResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
   finalizePayroll(options: FinalizePayrollOptions = {}): Observable<FinalizePayrollResponse> {
     return this.client.request<FinalizePayrollResponse, FinalizePayrollRequest>('POST', '/payroll/finalize', {
       body: options.body,
       responseSchema: FinalizePayrollResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

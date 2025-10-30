@@ -15,6 +15,7 @@ export interface ListLeaveBalancesOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const RequestLeaveRequestSchema = z.object({
@@ -35,6 +36,7 @@ export interface RequestLeaveOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: RequestLeaveRequest;
+  headers?: Record<string, string>;
 }
 
 const ApproveLeaveRequestSchema = z.object({
@@ -53,6 +55,7 @@ export interface ApproveLeaveOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: ApproveLeaveRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -62,18 +65,27 @@ export class LeaveApiService {
   listLeaveBalances(options: ListLeaveBalancesOptions = {}): Observable<ListLeaveBalancesResponse> {
     return this.client.request<ListLeaveBalancesResponse>('GET', '/leave/balances', {
       responseSchema: ListLeaveBalancesResponseSchema,
+      headers: options.headers,
     });
   }
   requestLeave(options: RequestLeaveOptions = {}): Observable<RequestLeaveResponse> {
     return this.client.request<RequestLeaveResponse, RequestLeaveRequest>('POST', '/leave/requests', {
       body: options.body,
       responseSchema: RequestLeaveResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
   approveLeave(options: ApproveLeaveOptions = {}): Observable<ApproveLeaveResponse> {
     return this.client.request<ApproveLeaveResponse, ApproveLeaveRequest>('POST', '/leave/requests/approve', {
       body: options.body,
       responseSchema: ApproveLeaveResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

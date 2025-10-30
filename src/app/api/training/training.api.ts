@@ -18,6 +18,7 @@ export interface ListCoursesOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const EnrollCourseRequestSchema = z.object({
@@ -34,6 +35,7 @@ export interface EnrollCourseOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: EnrollCourseRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -43,12 +45,17 @@ export class TrainingApiService {
   listCourses(options: ListCoursesOptions = {}): Observable<ListCoursesResponse> {
     return this.client.request<ListCoursesResponse>('GET', '/training/courses', {
       responseSchema: ListCoursesResponseSchema,
+      headers: options.headers,
     });
   }
   enrollCourse(options: EnrollCourseOptions = {}): Observable<EnrollCourseResponse> {
     return this.client.request<EnrollCourseResponse, EnrollCourseRequest>('POST', '/training/enroll', {
       body: options.body,
       responseSchema: EnrollCourseResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

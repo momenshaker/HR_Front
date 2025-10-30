@@ -128,6 +128,7 @@ function renderOptionsType(name, pieces) {
   } else {
     lines.push('  body?: undefined;');
   }
+  lines.push('  headers?: Record<string, string>;');
   lines.push('}');
   return lines.join('\n');
 }
@@ -161,6 +162,9 @@ function writeFolderApi(folder, folderSlug) {
     const pathValue = normalizePath(rawUrl);
     const pathParams = extractPathParams(pathValue);
     const queryParams = item.request.url?.query?.map((q) => q.key).filter(Boolean) ?? [];
+    const headerEntries = (item.request.header ?? [])
+      .filter((header) => !!header && header.disabled !== true && header.key && header.value)
+      .map((header) => ({ key: header.key, value: header.value }));
 
     const requestBodyRaw = item.request.body?.raw;
     let requestSchemaName;
@@ -221,6 +225,16 @@ function writeFolderApi(folder, folderSlug) {
     }
     if (responseSchemaName) {
       methodLineParts.push(`    responseSchema: ${responseSchemaName},`);
+    }
+    if (headerEntries.length > 0) {
+      methodLineParts.push('    headers: {');
+      methodLineParts.push('      ...(options.headers ?? {}),');
+      headerEntries.forEach((header) => {
+        methodLineParts.push(`      ${JSON.stringify(header.key)}: ${JSON.stringify(header.value)},`);
+      });
+      methodLineParts.push('    },');
+    } else {
+      methodLineParts.push('    headers: options.headers,');
     }
     methodLineParts.push('  });');
     methodLineParts.push('}');

@@ -21,6 +21,7 @@ export interface GetTimesheetOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const CreateTimeEntryRequestSchema = z.object({
@@ -40,6 +41,7 @@ export interface CreateTimeEntryOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: CreateTimeEntryRequest;
+  headers?: Record<string, string>;
 }
 
 const SubmitTimesheetRequestSchema = z.object({
@@ -61,6 +63,7 @@ export interface SubmitTimesheetOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: SubmitTimesheetRequest;
+  headers?: Record<string, string>;
 }
 
 const ApproveTimesheetRequestSchema = z.object({
@@ -78,6 +81,7 @@ export interface ApproveTimesheetOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: ApproveTimesheetRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -87,24 +91,37 @@ export class TimeAttendanceApiService {
   getTimesheet(options: GetTimesheetOptions = {}): Observable<GetTimesheetResponse> {
     return this.client.request<GetTimesheetResponse>('GET', '/time/timesheets/current', {
       responseSchema: GetTimesheetResponseSchema,
+      headers: options.headers,
     });
   }
   createTimeEntry(options: CreateTimeEntryOptions = {}): Observable<CreateTimeEntryResponse> {
     return this.client.request<CreateTimeEntryResponse, CreateTimeEntryRequest>('POST', '/time/entries', {
       body: options.body,
       responseSchema: CreateTimeEntryResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
   submitTimesheet(options: SubmitTimesheetOptions = {}): Observable<SubmitTimesheetResponse> {
     return this.client.request<SubmitTimesheetResponse, SubmitTimesheetRequest>('POST', '/time/timesheets/submit', {
       body: options.body,
       responseSchema: SubmitTimesheetResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
   approveTimesheet(options: ApproveTimesheetOptions = {}): Observable<ApproveTimesheetResponse> {
     return this.client.request<ApproveTimesheetResponse, ApproveTimesheetRequest>('POST', '/time/timesheets/approve', {
       body: options.body,
       responseSchema: ApproveTimesheetResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

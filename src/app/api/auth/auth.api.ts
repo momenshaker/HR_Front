@@ -26,6 +26,7 @@ export interface LoginOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: LoginRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -36,6 +37,10 @@ export class AuthApiService {
     return this.client.request<LoginResponse, LoginRequest>('POST', '/auth/login', {
       body: options.body,
       responseSchema: LoginResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

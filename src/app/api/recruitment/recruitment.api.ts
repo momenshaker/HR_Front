@@ -21,6 +21,7 @@ export interface ListCandidatesOptions {
     stage?: string | number | boolean;
   };
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const AdvanceCandidateRequestSchema = z.object({
@@ -38,6 +39,7 @@ export interface AdvanceCandidateOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: AdvanceCandidateRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -48,12 +50,17 @@ export class RecruitmentApiService {
     return this.client.request<ListCandidatesResponse>('GET', '/recruitment/candidates', {
       queryParams: options.query,
       responseSchema: ListCandidatesResponseSchema,
+      headers: options.headers,
     });
   }
   advanceCandidate(options: AdvanceCandidateOptions = {}): Observable<AdvanceCandidateResponse> {
     return this.client.request<AdvanceCandidateResponse, AdvanceCandidateRequest>('POST', '/recruitment/candidates/advance', {
       body: options.body,
       responseSchema: AdvanceCandidateResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }

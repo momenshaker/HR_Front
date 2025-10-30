@@ -18,6 +18,7 @@ export interface GetHeadcountSummaryOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const GetAttritionResponseSchema = z.object({
@@ -31,6 +32,7 @@ export interface GetAttritionOptions {
     year?: string | number | boolean;
   };
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,12 +42,14 @@ export class AnalyticsApiService {
   getHeadcountSummary(options: GetHeadcountSummaryOptions = {}): Observable<GetHeadcountSummaryResponse> {
     return this.client.request<GetHeadcountSummaryResponse>('GET', '/analytics/headcount', {
       responseSchema: GetHeadcountSummaryResponseSchema,
+      headers: options.headers,
     });
   }
   getAttrition(options: GetAttritionOptions = {}): Observable<GetAttritionResponse> {
     return this.client.request<GetAttritionResponse>('GET', '/analytics/attrition', {
       queryParams: options.query,
       responseSchema: GetAttritionResponseSchema,
+      headers: options.headers,
     });
   }
 }

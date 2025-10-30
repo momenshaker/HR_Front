@@ -18,6 +18,7 @@ export interface ListAnnouncementsOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: undefined;
+  headers?: Record<string, string>;
 }
 
 const PublishAnnouncementRequestSchema = z.object({
@@ -36,6 +37,7 @@ export interface PublishAnnouncementOptions {
   pathParams?: undefined;
   query?: undefined;
   body?: PublishAnnouncementRequest;
+  headers?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -45,12 +47,17 @@ export class CommunicationsApiService {
   listAnnouncements(options: ListAnnouncementsOptions = {}): Observable<ListAnnouncementsResponse> {
     return this.client.request<ListAnnouncementsResponse>('GET', '/communications/announcements', {
       responseSchema: ListAnnouncementsResponseSchema,
+      headers: options.headers,
     });
   }
   publishAnnouncement(options: PublishAnnouncementOptions = {}): Observable<PublishAnnouncementResponse> {
     return this.client.request<PublishAnnouncementResponse, PublishAnnouncementRequest>('POST', '/communications/announcements', {
       body: options.body,
       responseSchema: PublishAnnouncementResponseSchema,
+      headers: {
+        ...(options.headers ?? {}),
+        "Content-Type": "application/json",
+      },
     });
   }
 }
