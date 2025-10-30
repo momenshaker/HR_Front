@@ -8,15 +8,19 @@ $light-theme: mat.define-theme((
   )
 ));
 
+:root {
+  @include mat.all-component-themes($light-theme);
+}
+
 html {
-  color-scheme: mat.get-color-scheme($light-theme);
+  color-scheme: light;
 }
 
 body {
   margin: 0;
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: mat.get-theme-color($light-theme, background);
-  color: mat.get-theme-color($light-theme, on-background);
+  background-color: var(--mat-app-background-color, #fafafa);
+  color: var(--mat-app-text-color, rgba(0, 0, 0, 0.87));
 }
 
 .full-height {

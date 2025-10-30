@@ -1,4 +1,4 @@
-import { importProvidersFrom, inject, Injectable, Provider } from '@angular/core';
+import { EnvironmentProviders, importProvidersFrom, inject, Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +22,6 @@ export class SnackbarService {
   }
 }
 
-export function provideMatSnackBar(): Provider[] {
-  return [importProvidersFrom(MatSnackBarModule)];
+export function provideMatSnackBar(): EnvironmentProviders {
+  return importProvidersFrom(MatSnackBarModule);
 }
