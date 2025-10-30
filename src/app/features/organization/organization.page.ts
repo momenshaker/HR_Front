@@ -122,6 +122,7 @@ export class OrganizationPageComponent implements OnInit {
   private readonly organizationApi = inject(OrganizationApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
+  private readonly defaultListQuery = { page: 1, pageSize: 20 } as const;
 
   protected readonly displayedColumns = ['name', 'manager', 'actions'];
   protected readonly departments = signal<ListDepartmentsResponse['data']>([]);
@@ -141,7 +142,7 @@ export class OrganizationPageComponent implements OnInit {
   private loadDepartments(): void {
     this.loading.set(true);
     this.organizationApi
-      .listDepartments({})
+      .listDepartments({ query: this.defaultListQuery })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => this.departments.set(response.data),

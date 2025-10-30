@@ -105,7 +105,12 @@ export class ApiClient {
     if (!schema) {
       return value as TResponse;
     }
-    return schema.parse(value) as TResponse;
+    const result = schema.safeParse(value);
+    if (!result.success) {
+      console.warn('Failed to validate API response', result.error, value);
+      return value as TResponse;
+    }
+    return result.data as TResponse;
   }
 
   private buildCacheKey(method: string, url: string, params?: HttpParams): string | null {
