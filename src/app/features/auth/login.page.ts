@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -77,6 +77,12 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
+  private readonly redirectIfAuthenticated = effect(() => {
+    if (this.authService.isAuthenticated()) {
+      void this.router.navigate(['/organization']);
+    }
+  });
+
   protected readonly submitting = signal(false);
 
   readonly form = this.fb.group({
@@ -96,7 +102,6 @@ export class LoginPageComponent {
       .subscribe({
         next: () => {
           this.snackbar.success('Welcome back!');
-          void this.router.navigate(['/organization']);
         },
         error: () => {
           this.snackbar.error('Unable to sign in. Please check your credentials.');
