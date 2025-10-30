@@ -46,7 +46,7 @@ Generation heuristics infer path/query/body metadata and create helper option in
 
 ## Environments
 
-`src/environments/environment.ts` and `.prod.ts` expose the `apiBaseUrl` value. Update these files to point at the target backend environments.
+`src/environments/environment.ts` and `.prod.ts` expose the `apiBaseUrl` value and an `apiDefaultHeaders` object for headers that must accompany every request (for example, tenant or API key headers).
 
 ## Features
 

@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 
 export interface AppConfig {
   apiBaseUrl: string;
+  defaultHeaders?: Record<string, string>;
 }
 
 export const APP_CONFIG = new InjectionToken<AppConfig>('APP_CONFIG');
@@ -11,7 +12,8 @@ export function provideAppConfig(): Provider {
   return {
     provide: APP_CONFIG,
     useValue: {
-      apiBaseUrl: environment.apiBaseUrl
+      apiBaseUrl: environment.apiBaseUrl,
+      defaultHeaders: environment.apiDefaultHeaders
     }
   };
 }

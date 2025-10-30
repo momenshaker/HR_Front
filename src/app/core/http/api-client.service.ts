@@ -85,10 +85,13 @@ export class ApiClient {
   }
 
   private createHeaders(headers?: Record<string, string>): HttpHeaders | undefined {
-    if (!headers || Object.keys(headers).length === 0) {
+    const defaultHeaders = this.config.defaultHeaders ?? {};
+    const combined = { ...defaultHeaders, ...(headers ?? {}) };
+    const entries = Object.entries(combined).filter(([, value]) => value !== undefined && value !== null);
+    if (entries.length === 0) {
       return undefined;
     }
-    return new HttpHeaders(headers);
+    return new HttpHeaders(Object.fromEntries(entries));
   }
 
   private createContext(method: string): HttpContext | undefined {
