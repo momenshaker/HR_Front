@@ -12,7 +12,7 @@ const LoginRequestSchema = z.object({
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 
 const LoginResponseSchema = z.object({
-    "token": z.string(),
+    "AccessToken": z.string(),
     "expiresIn": z.number().int(),
     "user": z.object({
       "id": z.number().int(),

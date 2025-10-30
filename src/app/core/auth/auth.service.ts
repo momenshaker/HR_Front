@@ -30,8 +30,9 @@ export class AuthService {
   login(email: string, password: string) {
     return this.authApi.login({ body: { email, password } }).pipe(
       tap((response) => {
+        console.log(response)
         const newState: StoredAuthState = {
-          token: response.token,
+          token: response.AccessToken,
           user: response.user
         };
         this.stateSignal.set(newState);
