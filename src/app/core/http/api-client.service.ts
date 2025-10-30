@@ -47,7 +47,15 @@ export class ApiClient {
       .pipe(map((response) => this.parseResponse<TResponse>(response, options.responseSchema)));
 
     if (cacheKey) {
-      const shared$ = request$.pipe(shareReplay({ bufferSize: 1, refCount: true }));
+      const shared$ = request$.pipe(
+        shareReplay({
+          bufferSize: 1,
+          refCount: true,
+          resetOnComplete: true,
+          resetOnError: true,
+          resetOnRefCountZero: true
+        })
+      );
       this.cache.set(cacheKey, shared$);
       return shared$;
     }
