@@ -27,7 +27,7 @@ export class ApiClient {
   ): Observable<TResponse> {
     const url = this.resolveUrl(path, options.pathParams);
     const params = this.createParams(options.queryParams);
-    const headers = this.createHeaders(options.headers);
+    const headers = this.createHeaders(method, options.headers);
     const cacheKey = this.buildCacheKey(method, url, params);
 
     if (cacheKey && this.cache.has(cacheKey)) {
@@ -91,14 +91,20 @@ export class ApiClient {
     return params;
   }
 
-  private createHeaders(headers?: Record<string, string>): HttpHeaders | undefined {
+  private createHeaders(method: string, headers?: Record<string, string>): HttpHeaders | undefined {
     const defaultHeaders = this.config.defaultHeaders ?? {};
     const combined = { ...defaultHeaders, ...(headers ?? {}) };
     const entries = Object.entries(combined).filter(([, value]) => value !== undefined && value !== null);
     if (entries.length === 0) {
       return undefined;
     }
-    return new HttpHeaders(Object.fromEntries(entries));
+    const headerRecord = Object.fromEntries(entries);
+
+    if (method.toUpperCase() !== 'GET' && headerRecord['Idempotency-Key']) {
+      headerRecord['Idempotency-Key'] = generateIdempotencyKey();
+    }
+
+    return new HttpHeaders(headerRecord);
   }
 
   private createContext(method: string): HttpContext | undefined {
@@ -127,4 +133,12 @@ export class ApiClient {
     const serializedParams = params ? params.toString() : '';
     return `${method.toUpperCase()}::${url}?${serializedParams}`;
   }
+}
+
+function generateIdempotencyKey(): string {
+  const globalCrypto = typeof globalThis !== 'undefined' ? (globalThis as { crypto?: Crypto }).crypto : undefined;
+  if (globalCrypto?.randomUUID) {
+    return globalCrypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
