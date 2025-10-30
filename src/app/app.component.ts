@@ -1,6 +1,6 @@
 import { NgIf, NgFor } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { ChangeDetectionStrategy, Component, ViewChild, inject } from '@angular/core';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -34,7 +34,6 @@ const NAV_ITEMS: NavItem[] = [
     <mat-sidenav-container class="app-shell">
       <mat-sidenav
         *ngIf="isAuthenticated()"
-        #drawer
         class="app-sidenav"
         mode="side"
         opened
@@ -50,7 +49,7 @@ const NAV_ITEMS: NavItem[] = [
 
       <mat-sidenav-content>
         <mat-toolbar color="primary" class="app-toolbar">
-          <button *ngIf="isAuthenticated()" mat-icon-button (click)="drawer.toggle()" class="menu-button">
+          <button *ngIf="isAuthenticated()" mat-icon-button (click)="toggleDrawer()" class="menu-button">
             <mat-icon>menu</mat-icon>
           </button>
           <span class="app-title">HR Platform</span>
@@ -111,8 +110,13 @@ export class AppComponent {
   private readonly authService = inject(AuthService);
   protected readonly navItems = NAV_ITEMS;
   protected readonly isAuthenticated = this.authService.isAuthenticated;
+  @ViewChild(MatSidenav) private readonly drawer?: MatSidenav;
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleDrawer(): void {
+    this.drawer?.toggle();
   }
 }

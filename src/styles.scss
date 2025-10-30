@@ -2,14 +2,21 @@
 
 @include mat.core();
 
-:root {
-  color-scheme: light dark;
+$light-theme: mat.define-theme((
+  color: (
+    theme-type: light
+  )
+));
+
+html {
+  color-scheme: mat.get-color-scheme($light-theme);
 }
 
 body {
   margin: 0;
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: mat.get-theme-color(mat.define-light-theme((), ()), 'background');
+  background-color: mat.get-theme-color($light-theme, background);
+  color: mat.get-theme-color($light-theme, on-background);
 }
 
 .full-height {

@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { finalize } from 'rxjs';
-import { LeaveApiService, ListLeaveBalancesResponse } from '../../api/leave/leave.api';
+import { LeaveApiService, ListLeaveBalancesResponse, RequestLeaveRequest } from '../../api/leave/leave.api';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
@@ -133,7 +133,7 @@ export class LeavePageComponent {
   protected readonly approving = signal(false);
 
   readonly requestForm = this.fb.nonNullable.group({
-    type: ['VACATION', Validators.required],
+    type: ['VACATION' as RequestLeaveRequest['type'], Validators.required],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     reason: ['']
@@ -164,7 +164,7 @@ export class LeavePageComponent {
       return;
     }
     this.requesting.set(true);
-    const body = this.requestForm.getRawValue();
+    const body = this.requestForm.getRawValue() as RequestLeaveRequest;
     this.api
       .requestLeave({ body })
       .pipe(finalize(() => this.requesting.set(false)))

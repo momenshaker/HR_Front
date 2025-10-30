@@ -1,4 +1,4 @@
-import { HttpClient, HttpContextToken, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpContextToken, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, map, shareReplay } from 'rxjs';
 import { ZodTypeAny } from 'zod';
@@ -34,12 +34,14 @@ export class ApiClient {
       return this.cache.get(cacheKey) as Observable<TResponse>;
     }
 
+    const context = this.createContext(method);
+
     const request$ = this.http
       .request<TResponse>(method, url, {
         body: options.body,
         params,
         headers,
-        context: API_RETRY,
+        context,
         responseType: 'json'
       })
       .pipe(map((response) => this.parseResponse<TResponse>(response, options.responseSchema)));
@@ -87,6 +89,14 @@ export class ApiClient {
       return undefined;
     }
     return new HttpHeaders(headers);
+  }
+
+  private createContext(method: string): HttpContext {
+    const context = new HttpContext();
+    if (method.toUpperCase() === 'GET') {
+      context.set(API_RETRY, true);
+    }
+    return context;
   }
 
   private parseResponse<TResponse>(value: unknown, schema?: ZodTypeAny): TResponse {

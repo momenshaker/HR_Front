@@ -28,7 +28,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => Boolean(this.stateSignal().token));
 
   login(email: string, password: string) {
-    return this.authApi.login({ email, password }).pipe(
+    return this.authApi.login({ body: { email, password } }).pipe(
       tap((response) => {
         const newState: StoredAuthState = {
           token: response.token,
