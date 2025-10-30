@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc/node",
+    "types": ["node"]
+  },
+  "include": ["tools/**/*.mjs", "tools/**/*.ts"]
+}
