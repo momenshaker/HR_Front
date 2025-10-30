@@ -84,5 +84,8 @@
       }
     }
   },
-  "defaultProject": "hr-front"
+  "defaultProject": "hr-front",
+  "cli": {
+    "analytics": false
+  }
 }
