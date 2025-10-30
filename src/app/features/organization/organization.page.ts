@@ -6,13 +6,25 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { finalize } from 'rxjs';
-import { OrganizationApiService, ListDepartmentsResponse } from '../../api/organization/organization.api';
+import { DepartmentDto, OrganizationApiService } from '../../api/organization/organization.api';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { TableShellComponent } from '../../shared/components/table-shell/table-shell.component';
 import { FormShellComponent } from '../../shared/components/form-shell/form-shell.component';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+
+interface DepartmentFormValue {
+  name: string;
+  code: string;
+  parentDepartmentId: string | null;
+  managerId: string | null;
+  branch: string | null;
+  location: string | null;
+  description: string | null;
+  isActive: boolean;
+}
 
 @Component({
   selector: 'app-organization-page',
@@ -25,6 +37,7 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
+    MatCheckboxModule,
     TableShellComponent,
     FormShellComponent,
     LoadingStateComponent,
@@ -39,10 +52,24 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
               <th mat-header-cell *matHeaderCellDef>Name</th>
               <td mat-cell *matCellDef="let department">{{ department.name }}</td>
             </ng-container>
+
+            <ng-container matColumnDef="code">
+              <th mat-header-cell *matHeaderCellDef>Code</th>
+              <td mat-cell *matCellDef="let department">{{ department.code }}</td>
+            </ng-container>
+
             <ng-container matColumnDef="manager">
               <th mat-header-cell *matHeaderCellDef>Manager</th>
-              <td mat-cell *matCellDef="let department">{{ department.manager }}</td>
+              <td mat-cell *matCellDef="let department">
+                {{ department.managerName || department.managerId || '—' }}
+              </td>
             </ng-container>
+
+            <ng-container matColumnDef="isActive">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let department">{{ department.isActive ? 'Active' : 'Inactive' }}</td>
+            </ng-container>
+
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let department">
@@ -51,6 +78,7 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
                 </button>
               </td>
             </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
@@ -69,17 +97,57 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
             <mat-label>Name</mat-label>
             <input matInput formControlName="name" required />
             <mat-error *ngIf="departmentForm.controls.name.hasError('required')">Name is required</mat-error>
+            <mat-error *ngIf="departmentForm.controls.name.hasError('maxlength')">
+              Name must be 150 characters or less
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Code</mat-label>
+            <input matInput formControlName="code" required />
+            <mat-error *ngIf="departmentForm.controls.code.hasError('required')">Code is required</mat-error>
+            <mat-error *ngIf="departmentForm.controls.code.hasError('maxlength')">
+              Code must be 20 characters or less
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Parent Department ID</mat-label>
+            <input matInput formControlName="parentDepartmentId" />
           </mat-form-field>
 
           <mat-form-field appearance="fill">
             <mat-label>Manager ID</mat-label>
-            <input matInput type="number" formControlName="managerId" required />
-            <mat-error *ngIf="departmentForm.controls.managerId.hasError('required')">
-              Manager is required
+            <input matInput formControlName="managerId" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Branch</mat-label>
+            <input matInput formControlName="branch" />
+            <mat-error *ngIf="departmentForm.controls.branch.hasError('maxlength')">
+              Branch must be 100 characters or less
             </mat-error>
           </mat-form-field>
 
-          <div class="actions">
+          <mat-form-field appearance="fill">
+            <mat-label>Location</mat-label>
+            <input matInput formControlName="location" />
+            <mat-error *ngIf="departmentForm.controls.location.hasError('maxlength')">
+              Location must be 200 characters or less
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="3"></textarea>
+            <mat-error *ngIf="departmentForm.controls.description.hasError('maxlength')">
+              Description must be 500 characters or less
+            </mat-error>
+          </mat-form-field>
+
+          <mat-checkbox class="checkbox-field full-width" formControlName="isActive">Active</mat-checkbox>
+
+          <div class="actions full-width">
             <button mat-flat-button color="primary" [disabled]="departmentForm.invalid || saving()">
               {{ saving() ? 'Saving…' : (selectedDepartment() ? 'Update' : 'Create') }}
             </button>
@@ -98,17 +166,33 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
         gap: 24px;
         grid-template-columns: 2fr 1fr;
       }
+
       table {
         width: 100%;
       }
+
       .form-grid {
         display: grid;
         gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        align-items: start;
       }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      .checkbox-field {
+        display: flex;
+        align-items: center;
+      }
+
       .actions {
         display: flex;
         gap: 12px;
+        justify-content: flex-end;
       }
+
       @media (max-width: 1024px) {
         .organization-grid {
           grid-template-columns: 1fr;
@@ -122,17 +206,22 @@ export class OrganizationPageComponent implements OnInit {
   private readonly organizationApi = inject(OrganizationApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
-  private readonly defaultListQuery = { page: 1, pageSize: 20 } as const;
 
-  protected readonly displayedColumns = ['name', 'manager', 'actions'];
-  protected readonly departments = signal<ListDepartmentsResponse['data']>([]);
-  protected readonly selectedDepartment = signal<ListDepartmentsResponse['data'][number] | null>(null);
+  protected readonly displayedColumns = ['name', 'code', 'manager', 'isActive', 'actions'];
+  protected readonly departments = signal<DepartmentDto[]>([]);
+  protected readonly selectedDepartment = signal<DepartmentDto | null>(null);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
 
-  readonly departmentForm = this.fb.nonNullable.group({
-    name: ['', Validators.required],
-    managerId: [0, Validators.required]
+  readonly departmentForm = this.fb.group({
+    name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(150)]),
+    code: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(20)]),
+    parentDepartmentId: this.fb.control<string | null>(null),
+    managerId: this.fb.control<string | null>(null),
+    branch: this.fb.control<string | null>(null, [Validators.maxLength(100)]),
+    location: this.fb.control<string | null>(null, [Validators.maxLength(200)]),
+    description: this.fb.control<string | null>(null, [Validators.maxLength(500)]),
+    isActive: this.fb.nonNullable.control(true)
   });
 
   ngOnInit(): void {
@@ -142,33 +231,49 @@ export class OrganizationPageComponent implements OnInit {
   private loadDepartments(): void {
     this.loading.set(true);
     this.organizationApi
-      .listDepartments({ query: this.defaultListQuery })
+      .listDepartments()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.departments.set(response.data),
+        next: (response) => this.departments.set(response),
         error: () => this.snackbar.error('Failed to load departments')
       });
   }
 
-  editDepartment(department: ListDepartmentsResponse['data'][number]): void {
+  editDepartment(department: DepartmentDto): void {
     this.selectedDepartment.set(department);
     this.departmentForm.setValue({
       name: department.name,
-      managerId: 0
+      code: department.code,
+      parentDepartmentId: department.parentDepartmentId ?? null,
+      managerId: department.managerId ?? null,
+      branch: department.branch ?? null,
+      location: department.location ?? null,
+      description: department.description ?? null,
+      isActive: department.isActive
     });
   }
 
   resetForm(): void {
     this.selectedDepartment.set(null);
-    this.departmentForm.reset({ name: '', managerId: 0 });
+    this.departmentForm.reset({
+      name: '',
+      code: '',
+      parentDepartmentId: null,
+      managerId: null,
+      branch: null,
+      location: null,
+      description: null,
+      isActive: true
+    });
   }
 
   saveDepartment(): void {
     if (this.departmentForm.invalid || this.saving()) {
       return;
     }
+
     this.saving.set(true);
-    const body = this.departmentForm.getRawValue();
+    const body = this.buildRequestBody(this.departmentForm.getRawValue());
     const request$ = this.selectedDepartment()
       ? this.organizationApi.updateDepartment({
           pathParams: { id: this.selectedDepartment()!.id },
@@ -187,4 +292,27 @@ export class OrganizationPageComponent implements OnInit {
         error: () => this.snackbar.error('Failed to save department')
       });
   }
+
+  private buildRequestBody(formValue: DepartmentFormValue): DepartmentFormValue {
+    return {
+      ...formValue,
+      name: formValue.name.trim(),
+      code: formValue.code.trim(),
+      parentDepartmentId: this.toNullable(formValue.parentDepartmentId),
+      managerId: this.toNullable(formValue.managerId),
+      branch: this.toNullable(formValue.branch),
+      location: this.toNullable(formValue.location),
+      description: this.toNullable(formValue.description)
+    };
+  }
+
+  private toNullable(value: string | null): string | null {
+    if (value === null) {
+      return null;
+    }
+
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
 }
+
