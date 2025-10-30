@@ -91,12 +91,11 @@ export class ApiClient {
     return new HttpHeaders(headers);
   }
 
-  private createContext(method: string): HttpContext {
-    const context = new HttpContext();
-    if (method.toUpperCase() === 'GET') {
-      context.set(API_RETRY, true);
+  private createContext(method: string): HttpContext | undefined {
+    if (method.toUpperCase() !== 'GET') {
+      return undefined;
     }
-    return context;
+    return new HttpContext().set(API_RETRY, true);
   }
 
   private parseResponse<TResponse>(value: unknown, schema?: ZodTypeAny): TResponse {

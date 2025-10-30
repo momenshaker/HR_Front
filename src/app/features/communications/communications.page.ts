@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -90,7 +90,7 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CommunicationsPageComponent {
+export class CommunicationsPageComponent implements OnInit {
   private readonly api = inject(CommunicationsApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
@@ -104,7 +104,7 @@ export class CommunicationsPageComponent {
     body: ['', Validators.required]
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.loadAnnouncements();
   }
 

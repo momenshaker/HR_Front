@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -122,7 +122,7 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LeavePageComponent {
+export class LeavePageComponent implements OnInit {
   private readonly api = inject(LeaveApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
@@ -144,7 +144,7 @@ export class LeavePageComponent {
     comment: ['Enjoy!']
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.loadBalances();
   }
 

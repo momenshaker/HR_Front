@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -99,7 +99,7 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RecruitmentPageComponent {
+export class RecruitmentPageComponent implements OnInit {
   private readonly api = inject(RecruitmentApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
@@ -112,7 +112,7 @@ export class RecruitmentPageComponent {
     stage: ['SCREENING']
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.loadCandidates();
   }
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -88,7 +88,7 @@ import { SnackbarService } from '../../shared/services/snackbar';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyticsPageComponent {
+export class AnalyticsPageComponent implements OnInit {
   private readonly api = inject(AnalyticsApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
@@ -101,7 +101,7 @@ export class AnalyticsPageComponent {
     year: [2024]
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.loadHeadcount();
     this.loadAttrition();
   }

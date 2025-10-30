@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -125,7 +125,7 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PayrollPageComponent {
+export class PayrollPageComponent implements OnInit {
   private readonly api = inject(PayrollApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
@@ -145,7 +145,7 @@ export class PayrollPageComponent {
     period: ['', Validators.required]
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.loadRuns();
   }
 

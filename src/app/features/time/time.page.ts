@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -140,7 +140,7 @@ import { LoadingStateComponent } from '../../shared/components/loading-state/loa
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimePageComponent {
+export class TimePageComponent implements OnInit {
   private readonly api = inject(TimeAttendanceApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
@@ -168,7 +168,7 @@ export class TimePageComponent {
 
   readonly submitEntries: { date: string; project: string; hours: number }[] = [];
 
-  constructor() {
+  ngOnInit(): void {
     this.loadTimesheet();
   }
 
