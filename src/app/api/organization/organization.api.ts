@@ -5,64 +5,74 @@ import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/http/api-client.service';
 import { z } from 'zod';
 
-const ListDepartmentsResponseSchema = z.object({
-    "data": z.array(z.object({
-      "id": z.number().int(),
-      "name": z.string(),
-      "manager": z.string()
-    })),
-    "total": z.number().int()
-  });
+const DepartmentDtoSchema = z
+  .object({
+    id: z.string().uuid(),
+    name: z.string(),
+    code: z.string(),
+    parentDepartmentId: z.string().uuid().nullable().optional(),
+    parentDepartmentName: z.string().nullable().optional(),
+    managerId: z.string().uuid().nullable().optional(),
+    managerName: z.string().nullable().optional(),
+    branch: z.string().nullable().optional(),
+    location: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    isActive: z.boolean(),
+  })
+  .passthrough();
+export type DepartmentDto = z.infer<typeof DepartmentDtoSchema>;
+
+const ListDepartmentsResponseSchema = z.array(DepartmentDtoSchema);
 export type ListDepartmentsResponse = z.infer<typeof ListDepartmentsResponseSchema>;
 
 export interface ListDepartmentsOptions {
-  pathParams?: undefined;
-  query?: {
-    page?: string | number | boolean;
-    pageSize?: string | number | boolean;
-  };
-  body?: undefined;
   headers?: Record<string, string>;
 }
 
-const CreateDepartmentRequestSchema = z.object({
-    "name": z.string(),
-    "managerId": z.number().int()
-  });
+const CreateDepartmentRequestSchema = z
+  .object({
+    name: z.string().max(150),
+    code: z.string().max(20),
+    parentDepartmentId: z.string().uuid().nullable().optional(),
+    managerId: z.string().uuid().nullable().optional(),
+    branch: z.string().max(100).nullable().optional(),
+    location: z.string().max(200).nullable().optional(),
+    description: z.string().max(500).nullable().optional(),
+    isActive: z.boolean().optional(),
+  })
+  .strict();
 export type CreateDepartmentRequest = z.infer<typeof CreateDepartmentRequestSchema>;
 
-const CreateDepartmentResponseSchema = z.object({
-    "id": z.number().int(),
-    "name": z.string(),
-    "managerId": z.number().int()
-  });
-export type CreateDepartmentResponse = z.infer<typeof CreateDepartmentResponseSchema>;
-
 export interface CreateDepartmentOptions {
-  pathParams?: undefined;
-  query?: undefined;
   body?: CreateDepartmentRequest;
   headers?: Record<string, string>;
 }
 
-const UpdateDepartmentRequestSchema = z.object({
-    "name": z.string(),
-    "managerId": z.number().int()
-  });
+const UpdateDepartmentRequestSchema = z
+  .object({
+    name: z.string().max(150),
+    code: z.string().max(20),
+    parentDepartmentId: z.string().uuid().nullable().optional(),
+    managerId: z.string().uuid().nullable().optional(),
+    branch: z.string().max(100).nullable().optional(),
+    location: z.string().max(200).nullable().optional(),
+    description: z.string().max(500).nullable().optional(),
+    isActive: z.boolean().optional(),
+  })
+  .strict();
 export type UpdateDepartmentRequest = z.infer<typeof UpdateDepartmentRequestSchema>;
 
-const UpdateDepartmentResponseSchema = z.object({
-    "id": z.number().int(),
-    "name": z.string(),
-    "managerId": z.number().int()
-  });
-export type UpdateDepartmentResponse = z.infer<typeof UpdateDepartmentResponseSchema>;
+export interface GetDepartmentOptions {
+  pathParams: {
+    id: string;
+  };
+  headers?: Record<string, string>;
+}
 
 export interface UpdateDepartmentOptions {
   pathParams: {
-    id: string | number;
+    id: string;
   };
-  query?: undefined;
   body?: UpdateDepartmentRequest;
   headers?: Record<string, string>;
 }
@@ -72,30 +82,39 @@ export class OrganizationApiService {
   private readonly client = inject(ApiClient);
 
   listDepartments(options: ListDepartmentsOptions = {}): Observable<ListDepartmentsResponse> {
-    return this.client.request<ListDepartmentsResponse>('GET', '/organization/departments', {
-      queryParams: options.query,
+    return this.client.request<ListDepartmentsResponse>('GET', '/api/v1/Departments', {
       responseSchema: ListDepartmentsResponseSchema,
       headers: options.headers,
     });
   }
-  createDepartment(options: CreateDepartmentOptions = {}): Observable<CreateDepartmentResponse> {
-    return this.client.request<CreateDepartmentResponse, CreateDepartmentRequest>('POST', '/organization/departments', {
+
+  createDepartment(options: CreateDepartmentOptions = {}): Observable<DepartmentDto> {
+    return this.client.request<DepartmentDto, CreateDepartmentRequest>('POST', '/api/v1/Departments', {
       body: options.body,
-      responseSchema: CreateDepartmentResponseSchema,
+      responseSchema: DepartmentDtoSchema,
       headers: {
         ...(options.headers ?? {}),
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
   }
-  updateDepartment(options: UpdateDepartmentOptions): Observable<UpdateDepartmentResponse> {
-    return this.client.request<UpdateDepartmentResponse, UpdateDepartmentRequest>('PUT', '/organization/departments/:id', {
+
+  getDepartment(options: GetDepartmentOptions): Observable<DepartmentDto> {
+    return this.client.request<DepartmentDto>('GET', '/api/v1/Departments/:id', {
+      pathParams: options.pathParams,
+      responseSchema: DepartmentDtoSchema,
+      headers: options.headers,
+    });
+  }
+
+  updateDepartment(options: UpdateDepartmentOptions): Observable<DepartmentDto> {
+    return this.client.request<DepartmentDto, UpdateDepartmentRequest>('PUT', '/api/v1/Departments/:id', {
       pathParams: options.pathParams,
       body: options.body,
-      responseSchema: UpdateDepartmentResponseSchema,
+      responseSchema: DepartmentDtoSchema,
       headers: {
         ...(options.headers ?? {}),
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
   }
