@@ -1,6 +1,6 @@
 import { HttpClient, HttpContext, HttpContextToken, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, map, shareReplay } from 'rxjs';
+import { Observable, finalize, map, shareReplay } from 'rxjs';
 import { ZodTypeAny } from 'zod';
 import { APP_CONFIG } from '../config/app-config.provider';
 
@@ -48,12 +48,11 @@ export class ApiClient {
 
     if (cacheKey) {
       const shared$ = request$.pipe(
-        shareReplay({
-          bufferSize: 1,
-          refCount: true,
-          resetOnComplete: true,
-          resetOnError: true,
-          resetOnRefCountZero: true
+        shareReplay({ bufferSize: 1, refCount: true }),
+        finalize(() => {
+          if (this.cache.get(cacheKey) === shared$) {
+            this.cache.delete(cacheKey);
+          }
         })
       );
       this.cache.set(cacheKey, shared$);
