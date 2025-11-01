@@ -7,11 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { finalize } from 'rxjs';
-import {
-  EmployeesApiService,
-  ListEmployeesResponse,
-  GetEmployeeDetailsResponse
-} from '../../api/employees/employees.api';
+import { EmployeesApiService } from '../../api';
+import type { Employeedto, Employeedtopaginatedresponse } from '../../api/models';
 import { TableShellComponent } from '../../shared/components/table-shell/table-shell.component';
 import { FormShellComponent } from '../../shared/components/form-shell/form-shell.component';
 import { SnackbarService } from '../../shared/services/snackbar';
@@ -177,8 +174,8 @@ export class EmployeesPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   protected readonly displayedColumns = ['name', 'department', 'title', 'status', 'actions'];
-  protected readonly employees = signal<ListEmployeesResponse['data']>([]);
-  protected readonly selectedEmployee = signal<GetEmployeeDetailsResponse | null>(null);
+  protected readonly employees = signal<Employeedto[] | any[]>([]);
+  protected readonly selectedEmployee = signal<Employeedto | any | null>(null);
   protected readonly loading = signal(false);
   protected readonly creating = signal(false);
 
@@ -204,25 +201,28 @@ export class EmployeesPageComponent implements OnInit {
     this.loading.set(true);
     const { departmentId, page, pageSize } = this.filtersForm.getRawValue();
     this.employeesApi
-      .listEmployees({
+      .getApiEmployees({
         query: {
-          departmentId: departmentId || undefined,
+          q: departmentId || undefined,
           page: page ?? 1,
           pageSize: pageSize ?? 20
         }
       })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.employees.set(response.data),
+        next: (response) => {
+          const list = (response as Employeedtopaginatedresponse)?.Items ?? [];
+          this.employees.set(list as Employeedto[]);
+        },
         error: () => this.snackbar.error('Failed to load employees')
       });
   }
 
-  selectEmployee(employee: ListEmployeesResponse['data'][number]): void {
+  selectEmployee(employee: any): void {
     this.employeesApi
-      .getEmployeeDetails({ pathParams: { id: employee.id } })
+      .getApiEmployeesId({ pathParams: { id: (employee.id ?? employee.Id) } })
       .subscribe({
-        next: (detail) => this.selectedEmployee.set(detail),
+        next: (detail) => this.selectedEmployee.set(detail as Employeedto),
         error: () => this.snackbar.error('Failed to load employee details')
       });
   }
@@ -234,7 +234,7 @@ export class EmployeesPageComponent implements OnInit {
     this.creating.set(true);
     const body = this.createForm.getRawValue();
     this.employeesApi
-      .createEmployee({ body })
+      .postApiEmployees({ body: body as any })
       .pipe(finalize(() => this.creating.set(false)))
       .subscribe({
         next: () => {

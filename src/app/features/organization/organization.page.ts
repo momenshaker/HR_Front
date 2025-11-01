@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { finalize } from 'rxjs';
-import { DepartmentDto, OrganizationApiService } from '../../api/organization/organization.api';
+import { DepartmentsApiService } from '../../api';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { TableShellComponent } from '../../shared/components/table-shell/table-shell.component';
 import { FormShellComponent } from '../../shared/components/form-shell/form-shell.component';
@@ -203,13 +203,13 @@ interface DepartmentFormValue {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrganizationPageComponent implements OnInit {
-  private readonly organizationApi = inject(OrganizationApiService);
+  private readonly organizationApi = inject(DepartmentsApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly displayedColumns = ['name', 'code', 'manager', 'isActive', 'actions'];
-  protected readonly departments = signal<DepartmentDto[]>([]);
-  protected readonly selectedDepartment = signal<DepartmentDto | null>(null);
+  protected readonly departments = signal<any[]>([]);
+  protected readonly selectedDepartment = signal<any | null>(null);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
 
@@ -231,15 +231,15 @@ export class OrganizationPageComponent implements OnInit {
   private loadDepartments(): void {
     this.loading.set(true);
     this.organizationApi
-      .listDepartments()
+      .getApiOrganizationsOrganizationidDepartments({ pathParams: { organizationId: 1 } })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.departments.set(response),
+        next: (response) => this.departments.set(((response as any)?.Items ?? []) as any[]),
         error: () => this.snackbar.error('Failed to load departments')
       });
   }
 
-  editDepartment(department: DepartmentDto): void {
+  editDepartment(department: any): void {
     this.selectedDepartment.set(department);
     this.departmentForm.setValue({
       name: department.name,
@@ -275,11 +275,14 @@ export class OrganizationPageComponent implements OnInit {
     this.saving.set(true);
     const body = this.buildRequestBody(this.departmentForm.getRawValue());
     const request$ = this.selectedDepartment()
-      ? this.organizationApi.updateDepartment({
-          pathParams: { id: this.selectedDepartment()!.id },
-          body
+      ? this.organizationApi.putApiOrganizationsOrganizationidDepartmentsDepartmentid({
+          pathParams: { organizationId: 1, departmentId: this.selectedDepartment()!.id },
+          body: body as any
         })
-      : this.organizationApi.createDepartment({ body });
+      : this.organizationApi.postApiOrganizationsOrganizationidDepartments({
+          pathParams: { organizationId: 1 },
+          body: body as any
+        });
 
     request$
       .pipe(finalize(() => this.saving.set(false)))

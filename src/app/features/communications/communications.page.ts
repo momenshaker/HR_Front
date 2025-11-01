@@ -7,10 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { finalize } from 'rxjs';
-import {
-  CommunicationsApiService,
-  ListAnnouncementsResponse
-} from '../../api/communications/communications.api';
+import { CommsannouncementsApiService } from '../../api';
+import type { Commsannouncementdtopaginatedresponse } from '../../api/models';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
@@ -91,11 +89,11 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommunicationsPageComponent implements OnInit {
-  private readonly api = inject(CommunicationsApiService);
+  private readonly api = inject(CommsannouncementsApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
 
-  protected readonly announcements = signal<ListAnnouncementsResponse['data']>([]);
+  protected readonly announcements = signal<any[]>([]);
   protected readonly loading = signal(false);
   protected readonly publishing = signal(false);
 
@@ -111,10 +109,18 @@ export class CommunicationsPageComponent implements OnInit {
   private loadAnnouncements(): void {
     this.loading.set(true);
     this.api
-      .listAnnouncements()
+      .getApiCommsAnnouncements()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.announcements.set(response.data),
+        next: (response) => {
+          const data = (response as Commsannouncementdtopaginatedresponse)?.Items ?? [];
+          // map to UI shape expected by template
+          const mapped = data.map((a: any) => ({
+            title: a.Title ?? a.title ?? '',
+            publishedAt: a.PublishedAtUtc ?? a.publishedAt ?? null
+          }));
+          this.announcements.set(mapped);
+        },
         error: () => this.snackbar.error('Failed to load announcements')
       });
   }
@@ -126,7 +132,7 @@ export class CommunicationsPageComponent implements OnInit {
     this.publishing.set(true);
     const body = this.publishForm.getRawValue();
     this.api
-      .publishAnnouncement({ body })
+      .postApiCommsAnnouncements({ body: body as any })
       .pipe(finalize(() => this.publishing.set(false)))
       .subscribe({
         next: () => {

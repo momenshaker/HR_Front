@@ -28,12 +28,12 @@ export class AuthService {
   readonly isAuthenticated = computed(() => Boolean(this.stateSignal().token));
 
   login(email: string, password: string) {
-    return this.authApi.login({ body: { email, password } }).pipe(
+    return this.authApi.postApiV1AuthLogin({ body: { Email: email, Password: password } as any }).pipe(
       tap((response) => {
         console.log(response)
         const newState: StoredAuthState = {
-          token: response.AccessToken,
-          user: response.user
+          token: (response as any).AccessToken ?? (response as any).token ?? null,
+          user: (response as any).user ?? null
         };
         this.stateSignal.set(newState);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));

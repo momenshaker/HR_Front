@@ -88,3 +88,22 @@ Each page uses Angular Signals for UI state, reactive forms for validation, and 
 3. Scaffold new feature pages under `src/app/features/<folder>` using the generated service.
 
 Generated files contain a banner and should not be edited manually.
+
+## OpenAPI (Swagger) support
+
+In addition to the Postman-driven generator, you can generate API services directly from an OpenAPI (Swagger) spec.
+
+- Place the Swagger JSON at `src/assets/api/swagger.json`, or pass a source via `--src`.
+- Generate services into `src/app/api/openapi`:
+
+```
+npm run api:generate:openapi
+```
+
+Or run with a custom source:
+
+```
+node tools/openapi-codegen.mjs --src https://localhost:60021/swagger/v1/swagger.json
+```
+
+The generator emits one Angular service per OpenAPI tag (class names end with `OpenApiService`) and uses the shared `ApiClient`. Types are emitted as `unknown` by default for simplicity; narrow them incrementally if needed.

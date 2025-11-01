@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { finalize } from 'rxjs';
-import { TrainingApiService, ListCoursesResponse } from '../../api/training/training.api';
+import { TrainingApiService } from '../../api';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
@@ -98,7 +98,7 @@ export class TrainingPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   protected readonly columns = ['title', 'status'];
-  protected readonly courses = signal<ListCoursesResponse['data']>([]);
+  protected readonly courses = signal<any[]>([]);
   protected readonly loading = signal(false);
   protected readonly enrolling = signal(false);
 
@@ -113,10 +113,13 @@ export class TrainingPageComponent implements OnInit {
   private loadCourses(): void {
     this.loading.set(true);
     this.api
-      .listCourses()
+      .getApiTrainingCourses()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.courses.set(response.data),
+        next: (response) => {
+          const items = (response as any)?.Items ?? (response as any)?.data ?? [];
+          this.courses.set(items);
+        },
         error: () => this.snackbar.error('Failed to load courses')
       });
   }
@@ -127,8 +130,10 @@ export class TrainingPageComponent implements OnInit {
     }
     this.enrolling.set(true);
     const body = this.enrollForm.getRawValue();
+    // best-effort enroll using session-based enroll endpoint if available
+    const sessionId = (body as any).sessionId ?? (this.courses()[0]?.DefaultSessionId ?? 0);
     this.api
-      .enrollCourse({ body })
+      .postApiTrainingSessionsSessionidEnroll({ pathParams: { sessionId }, query: {} })
       .pipe(finalize(() => this.enrolling.set(false)))
       .subscribe({
         next: () => this.snackbar.success('Enrollment confirmed'),

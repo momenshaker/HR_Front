@@ -1,35 +1,71 @@
 /* eslint-disable */
-/* Auto-generated from Postman collection. Do not edit manually. */
+/* Auto-generated from OpenAPI spec. Do not edit manually. */
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/http/api-client.service';
-import { z } from 'zod';
 
-const GetHeadcountSummaryResponseSchema = z.object({
-    "total": z.number().int(),
-    "departments": z.array(z.object({
-      "name": z.string(),
-      "headcount": z.number().int()
-    }))
-  });
-export type GetHeadcountSummaryResponse = z.infer<typeof GetHeadcountSummaryResponseSchema>;
-
-export interface GetHeadcountSummaryOptions {
+import type { Errorresponse } from '../models';
+export interface GetapianalyticsheadcountOptions {
   pathParams?: undefined;
-  query?: undefined;
+  query?: {
+    orgId?: string | number | boolean;
+    departmentId?: string | number | boolean;
+    "api-version"?: string | number | boolean;
+  };
   body?: undefined;
   headers?: Record<string, string>;
 }
 
-const GetAttritionResponseSchema = z.object({
-    "rate": z.number()
-  });
-export type GetAttritionResponse = z.infer<typeof GetAttritionResponseSchema>;
-
-export interface GetAttritionOptions {
+export interface GetapianalyticsutilizationOptions {
   pathParams?: undefined;
   query?: {
+    orgId?: string | number | boolean;
+    from?: string | number | boolean;
+    to?: string | number | boolean;
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface GetapianalyticsleaveusageOptions {
+  pathParams?: undefined;
+  query?: {
+    orgId?: string | number | boolean;
     year?: string | number | boolean;
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface GetapianalyticspayrolltotalsOptions {
+  pathParams?: undefined;
+  query?: {
+    orgId?: string | number | boolean;
+    from?: string | number | boolean;
+    to?: string | number | boolean;
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface GetapianalyticsrecruitmentfunnelOptions {
+  pathParams?: undefined;
+  query?: {
+    jobId?: string | number | boolean;
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface GetapianalyticstrainingcomplianceOptions {
+  pathParams?: undefined;
+  query?: {
+    orgId?: string | number | boolean;
+    "api-version"?: string | number | boolean;
   };
   body?: undefined;
   headers?: Record<string, string>;
@@ -39,17 +75,46 @@ export interface GetAttritionOptions {
 export class AnalyticsApiService {
   private readonly client = inject(ApiClient);
 
-  getHeadcountSummary(options: GetHeadcountSummaryOptions = {}): Observable<GetHeadcountSummaryResponse> {
-    return this.client.request<GetHeadcountSummaryResponse>('GET', '/analytics/headcount', {
-      responseSchema: GetHeadcountSummaryResponseSchema,
-      headers: options.headers,
-    });
-  }
-  getAttrition(options: GetAttritionOptions = {}): Observable<GetAttritionResponse> {
-    return this.client.request<GetAttritionResponse>('GET', '/analytics/attrition', {
+  getApiAnalyticsHeadcount(options: GetapianalyticsheadcountOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/analytics/headcount', {
       queryParams: options.query,
-      responseSchema: GetAttritionResponseSchema,
       headers: options.headers,
     });
   }
+
+  getApiAnalyticsUtilization(options: GetapianalyticsutilizationOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/analytics/utilization', {
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
+  getApiAnalyticsLeaveUsage(options: GetapianalyticsleaveusageOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/analytics/leave-usage', {
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
+  getApiAnalyticsPayrollTotals(options: GetapianalyticspayrolltotalsOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/analytics/payroll-totals', {
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
+  getApiAnalyticsRecruitmentFunnel(options: GetapianalyticsrecruitmentfunnelOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/analytics/recruitment-funnel', {
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
+  getApiAnalyticsTrainingCompliance(options: GetapianalyticstrainingcomplianceOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/analytics/training-compliance', {
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
 }

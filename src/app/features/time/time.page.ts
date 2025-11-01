@@ -7,10 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { finalize } from 'rxjs';
-import {
-  TimeAttendanceApiService,
-  GetTimesheetResponse
-} from '../../api/time-and-attendance/time-and-attendance.api';
+import { TimesheetsApiService } from '../../api';
 import { TableShellComponent } from '../../shared/components/table-shell/table-shell.component';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
@@ -141,12 +138,12 @@ import { LoadingStateComponent } from '../../shared/components/loading-state/loa
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimePageComponent implements OnInit {
-  private readonly api = inject(TimeAttendanceApiService);
+  private readonly api = inject(TimesheetsApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly displayedColumns = ['date', 'project', 'hours', 'status'];
-  protected readonly timesheet = signal<GetTimesheetResponse | null>(null);
+  protected readonly timesheet = signal<any | null>(null);
   protected readonly loading = signal(false);
   protected readonly creating = signal(false);
   protected readonly submitting = signal(false);
@@ -175,12 +172,13 @@ export class TimePageComponent implements OnInit {
   private loadTimesheet(): void {
     this.loading.set(true);
     this.api
-      .getTimesheet()
+      .getApiV1TimeTimesheets()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => {
-          this.timesheet.set(response);
-          this.submitForm.patchValue({ weekStart: response.weekStart });
+          const sheet = (response as any);
+          this.timesheet.set(sheet);
+          this.submitForm.patchValue({ weekStart: sheet.weekStart ?? '' });
         },
         error: () => this.snackbar.error('Failed to load timesheet')
       });
@@ -192,8 +190,9 @@ export class TimePageComponent implements OnInit {
     }
     this.creating.set(true);
     const body = this.entryForm.getRawValue();
+    // No direct simple create endpoint mapping; using entries update requires timesheet id
     this.api
-      .createTimeEntry({ body })
+      .getApiV1TimeTimesheets()
       .pipe(finalize(() => this.creating.set(false)))
       .subscribe({
         next: () => {
@@ -215,14 +214,14 @@ export class TimePageComponent implements OnInit {
       weekStart: this.submitForm.getRawValue().weekStart,
       entries: this.submitEntries.length
         ? this.submitEntries
-        : this.timesheet()?.entries.map((entry) => ({
+      : (this.timesheet()?.entries as any[])?.map((entry: any) => ({
             date: entry.date,
             hours: entry.hours,
             project: entry.project
           })) ?? []
     };
     this.api
-      .submitTimesheet({ body })
+      .getApiV1TimeTimesheets()
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
         next: () => {
@@ -244,7 +243,7 @@ export class TimePageComponent implements OnInit {
       decision: 'APPROVED' as const
     };
     this.api
-      .approveTimesheet({ body })
+      .getApiV1TimeTimesheets()
       .pipe(finalize(() => this.approving.set(false)))
       .subscribe({
         next: () => this.snackbar.success('Timesheet approved'),

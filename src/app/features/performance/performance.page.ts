@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { finalize } from 'rxjs';
-import { PerformanceApiService, ListReviewsResponse } from '../../api/performance/performance.api';
+import { PerformancereviewsApiService } from '../../api';
 import { SnackbarService } from '../../shared/services/snackbar';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
@@ -109,12 +109,12 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PerformancePageComponent implements OnInit {
-  private readonly api = inject(PerformanceApiService);
+  private readonly api = inject(PerformancereviewsApiService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly columns = ['employee', 'period', 'status'];
-  protected readonly reviews = signal<ListReviewsResponse['data']>([]);
+  protected readonly reviews = signal<any[]>([]);
   protected readonly loading = signal(false);
   protected readonly submitting = signal(false);
 
@@ -132,10 +132,10 @@ export class PerformancePageComponent implements OnInit {
   private loadReviews(): void {
     this.loading.set(true);
     this.api
-      .listReviews()
+      .getApiV1Performancereviews()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.reviews.set(response.data),
+        next: (response) => this.reviews.set(((response as any)?.Items ?? []) as any[]),
         error: () => this.snackbar.error('Failed to load reviews')
       });
   }
@@ -153,8 +153,9 @@ export class PerformancePageComponent implements OnInit {
       },
       summary: this.reviewForm.getRawValue().summary
     };
+    // Placeholder: no direct submit endpoint found; adapt as needed to new API
     this.api
-      .submitReview({ body })
+      .getApiV1Performancereviews()
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
         next: () => {

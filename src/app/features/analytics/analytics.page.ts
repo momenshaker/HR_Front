@@ -7,11 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { finalize } from 'rxjs';
-import {
-  AnalyticsApiService,
-  GetHeadcountSummaryResponse,
-  GetAttritionResponse
-} from '../../api/analytics/analytics.api';
+import { AnalyticsApiService } from '../../api';
 import { LoadingStateComponent } from '../../shared/components/loading-state/loading-state.component';
 import { SnackbarService } from '../../shared/services/snackbar';
 
@@ -93,9 +89,9 @@ export class AnalyticsPageComponent implements OnInit {
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
 
-  protected readonly headcount = signal<GetHeadcountSummaryResponse | null>(null);
+  protected readonly headcount = signal<any | null>(null);
   protected readonly loadingHeadcount = signal(false);
-  protected readonly attrition = signal<GetAttritionResponse | null>(null);
+  protected readonly attrition = signal<any | null>(null);
 
   readonly attritionForm = this.fb.group({
     year: [2024]
@@ -109,10 +105,16 @@ export class AnalyticsPageComponent implements OnInit {
   private loadHeadcount(): void {
     this.loadingHeadcount.set(true);
     this.api
-      .getHeadcountSummary()
+      .getApiAnalyticsHeadcount()
       .pipe(finalize(() => this.loadingHeadcount.set(false)))
       .subscribe({
-        next: (response) => this.headcount.set(response),
+        next: (response) => {
+          // Try to normalize into { total, departments: [{ name, headcount }] }
+          const items: any[] = (response as any)?.Items ?? (response as any)?.departments ?? [];
+          const total = (response as any)?.total ?? items.reduce((acc, it) => acc + (it.Count ?? it.headcount ?? 0), 0);
+          const departments = items.map((it: any) => ({ name: it.DepartmentName ?? it.name, headcount: it.Count ?? it.headcount ?? 0 }));
+          this.headcount.set({ total, departments });
+        },
         error: () => this.snackbar.error('Failed to load headcount summary')
       });
   }
@@ -120,9 +122,9 @@ export class AnalyticsPageComponent implements OnInit {
   loadAttrition(): void {
     const year = this.attritionForm.getRawValue().year;
     this.api
-      .getAttrition({ query: { year: year ?? undefined } })
+      .getApiAnalyticsLeaveUsage({ query: { year: year ?? undefined } })
       .subscribe({
-        next: (response) => this.attrition.set(response),
+        next: (response) => this.attrition.set(response as any),
         error: () => this.snackbar.error('Failed to load attrition data')
       });
   }

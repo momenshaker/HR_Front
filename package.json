@@ -10,6 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "api:generate": "node tools/postman-codegen.mjs",
+    "api:generate:openapi": "node tools/openapi-codegen.mjs --src src/assets/api/swagger.json",
     "format": "prettier --write .",
     "postinstall": "npm run api:generate"
   },

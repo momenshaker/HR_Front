@@ -1,101 +1,106 @@
 /* eslint-disable */
-/* Auto-generated from Postman collection. Do not edit manually. */
+/* Auto-generated from OpenAPI spec. Do not edit manually. */
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/http/api-client.service';
-import { z } from 'zod';
 
-const ListEmployeesResponseSchema = z.object({
-    "data": z.array(z.object({
-      "id": z.number().int(),
-      "firstName": z.string(),
-      "lastName": z.string(),
-      "department": z.string(),
-      "title": z.string(),
-      "status": z.enum(['ACTIVE'])
-    })),
-    "total": z.number().int()
-  });
-export type ListEmployeesResponse = z.infer<typeof ListEmployeesResponseSchema>;
-
-export interface ListEmployeesOptions {
+import type { Createemployeerequest, Employeedepartmentidentifiersrequest, Errorresponse, Updateemployeerequest } from '../models';
+export interface GetapiemployeesOptions {
   pathParams?: undefined;
   query?: {
-    departmentId?: string | number | boolean;
+    orgId?: string | number | boolean;
+    q?: string | number | boolean;
     page?: string | number | boolean;
     pageSize?: string | number | boolean;
+    "api-version"?: string | number | boolean;
   };
   body?: undefined;
   headers?: Record<string, string>;
 }
 
-const GetEmployeeDetailsResponseSchema = z.object({
-    "id": z.number().int(),
-    "firstName": z.string(),
-    "lastName": z.string(),
-    "email": z.string(),
-    "status": z.enum(['ACTIVE']),
-    "job": z.object({
-      "title": z.string(),
-      "department": z.string(),
-      "manager": z.string()
-    })
-  });
-export type GetEmployeeDetailsResponse = z.infer<typeof GetEmployeeDetailsResponseSchema>;
-
-export interface GetEmployeeDetailsOptions {
-  pathParams: {
-    id: string | number;
-  };
-  query?: undefined;
-  body?: undefined;
-  headers?: Record<string, string>;
-}
-
-const CreateEmployeeRequestSchema = z.object({
-    "firstName": z.string(),
-    "lastName": z.string(),
-    "email": z.string(),
-    "departmentId": z.number().int(),
-    "title": z.string()
-  });
-export type CreateEmployeeRequest = z.infer<typeof CreateEmployeeRequestSchema>;
-
-const CreateEmployeeResponseSchema = z.object({
-    "id": z.number().int(),
-    "firstName": z.string(),
-    "lastName": z.string(),
-    "email": z.string(),
-    "status": z.enum(['INVITED'])
-  });
-export type CreateEmployeeResponse = z.infer<typeof CreateEmployeeResponseSchema>;
-
-export interface CreateEmployeeOptions {
+export interface PostapiemployeesOptions {
   pathParams?: undefined;
-  query?: undefined;
-  body?: CreateEmployeeRequest;
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: Createemployeerequest;
   headers?: Record<string, string>;
 }
 
-const UpdateEmployeeRequestSchema = z.object({
-    "title": z.string(),
-    "status": z.enum(['ACTIVE'])
-  });
-export type UpdateEmployeeRequest = z.infer<typeof UpdateEmployeeRequestSchema>;
-
-const UpdateEmployeeResponseSchema = z.object({
-    "id": z.number().int(),
-    "title": z.string(),
-    "status": z.enum(['ACTIVE'])
-  });
-export type UpdateEmployeeResponse = z.infer<typeof UpdateEmployeeResponseSchema>;
-
-export interface UpdateEmployeeOptions {
+export interface GetapiemployeesidOptions {
   pathParams: {
     id: string | number;
   };
-  query?: undefined;
-  body?: UpdateEmployeeRequest;
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface PutapiemployeesidOptions {
+  pathParams: {
+    id: string | number;
+  };
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: Updateemployeerequest;
+  headers?: Record<string, string>;
+}
+
+export interface DeleteapiemployeesidOptions {
+  pathParams: {
+    id: string | number;
+  };
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface GetapiemployeesemployeeiddepartmentsOptions {
+  pathParams: {
+    employeeId: string | number;
+  };
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: undefined;
+  headers?: Record<string, string>;
+}
+
+export interface PostapiemployeesemployeeiddepartmentsassignOptions {
+  pathParams: {
+    employeeId: string | number;
+  };
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: Employeedepartmentidentifiersrequest;
+  headers?: Record<string, string>;
+}
+
+export interface PostapiemployeesemployeeiddepartmentsreplaceOptions {
+  pathParams: {
+    employeeId: string | number;
+  };
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: Employeedepartmentidentifiersrequest;
+  headers?: Record<string, string>;
+}
+
+export interface PostapiemployeesemployeeiddepartmentsunassignOptions {
+  pathParams: {
+    employeeId: string | number;
+  };
+  query?: {
+    "api-version"?: string | number | boolean;
+  };
+  body?: Employeedepartmentidentifiersrequest;
   headers?: Record<string, string>;
 }
 
@@ -103,39 +108,94 @@ export interface UpdateEmployeeOptions {
 export class EmployeesApiService {
   private readonly client = inject(ApiClient);
 
-  listEmployees(options: ListEmployeesOptions = {}): Observable<ListEmployeesResponse> {
-    return this.client.request<ListEmployeesResponse>('GET', '/employees', {
+  getApiEmployees(options: GetapiemployeesOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/employees', {
       queryParams: options.query,
-      responseSchema: ListEmployeesResponseSchema,
       headers: options.headers,
     });
   }
-  getEmployeeDetails(options: GetEmployeeDetailsOptions): Observable<GetEmployeeDetailsResponse> {
-    return this.client.request<GetEmployeeDetailsResponse>('GET', '/employees/:id', {
+
+  postApiEmployees(options: PostapiemployeesOptions = {}): Observable<Errorresponse> {
+    return this.client.request<Errorresponse, Createemployeerequest>('POST', '/api/employees', {
+      queryParams: options.query,
+      body: options.body,
+      headers: {
+        ...(options.headers ?? {}),
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  getApiEmployeesId(options: GetapiemployeesidOptions): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/employees/:id', {
       pathParams: options.pathParams,
-      responseSchema: GetEmployeeDetailsResponseSchema,
+      queryParams: options.query,
       headers: options.headers,
     });
   }
-  createEmployee(options: CreateEmployeeOptions = {}): Observable<CreateEmployeeResponse> {
-    return this.client.request<CreateEmployeeResponse, CreateEmployeeRequest>('POST', '/employees', {
-      body: options.body,
-      responseSchema: CreateEmployeeResponseSchema,
-      headers: {
-        ...(options.headers ?? {}),
-        "Content-Type": "application/json",
-      },
-    });
-  }
-  updateEmployee(options: UpdateEmployeeOptions): Observable<UpdateEmployeeResponse> {
-    return this.client.request<UpdateEmployeeResponse, UpdateEmployeeRequest>('PUT', '/employees/:id', {
+
+  putApiEmployeesId(options: PutapiemployeesidOptions): Observable<Errorresponse> {
+    return this.client.request<Errorresponse, Updateemployeerequest>('PUT', '/api/employees/:id', {
       pathParams: options.pathParams,
+      queryParams: options.query,
       body: options.body,
-      responseSchema: UpdateEmployeeResponseSchema,
       headers: {
         ...(options.headers ?? {}),
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
   }
+
+  deleteApiEmployeesId(options: DeleteapiemployeesidOptions): Observable<unknown> {
+    return this.client.request<unknown>('DELETE', '/api/employees/:id', {
+      pathParams: options.pathParams,
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
+  getApiEmployeesEmployeeidDepartments(options: GetapiemployeesemployeeiddepartmentsOptions): Observable<Errorresponse> {
+    return this.client.request<Errorresponse>('GET', '/api/employees/:employeeId/departments', {
+      pathParams: options.pathParams,
+      queryParams: options.query,
+      headers: options.headers,
+    });
+  }
+
+  postApiEmployeesEmployeeidDepartmentsAssign(options: PostapiemployeesemployeeiddepartmentsassignOptions): Observable<unknown> {
+    return this.client.request<unknown, Employeedepartmentidentifiersrequest>('POST', '/api/employees/:employeeId/departments:assign', {
+      pathParams: options.pathParams,
+      queryParams: options.query,
+      body: options.body,
+      headers: {
+        ...(options.headers ?? {}),
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  postApiEmployeesEmployeeidDepartmentsReplace(options: PostapiemployeesemployeeiddepartmentsreplaceOptions): Observable<unknown> {
+    return this.client.request<unknown, Employeedepartmentidentifiersrequest>('POST', '/api/employees/:employeeId/departments:replace', {
+      pathParams: options.pathParams,
+      queryParams: options.query,
+      body: options.body,
+      headers: {
+        ...(options.headers ?? {}),
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  postApiEmployeesEmployeeidDepartmentsUnassign(options: PostapiemployeesemployeeiddepartmentsunassignOptions): Observable<unknown> {
+    return this.client.request<unknown, Employeedepartmentidentifiersrequest>('POST', '/api/employees/:employeeId/departments:unassign', {
+      pathParams: options.pathParams,
+      queryParams: options.query,
+      body: options.body,
+      headers: {
+        ...(options.headers ?? {}),
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
 }
